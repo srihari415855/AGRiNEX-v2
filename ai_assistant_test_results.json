@@ -1,0 +1,114 @@
+{
+  "total": 18,
+  "passed": 18,
+  "results": [
+    {
+      "id": "TC-01",
+      "name": "Frontend Dashboard Route (/app)",
+      "status": "PASS",
+      "details": "Status: 200"
+    },
+    {
+      "id": "TC-02",
+      "name": "Frontend Dedicated Ask Page (/app/ask)",
+      "status": "PASS",
+      "details": "Status: 200"
+    },
+    {
+      "id": "TC-03",
+      "name": "Backend API Health Endpoint",
+      "status": "PASS",
+      "details": "Payload: {'status': 'healthy', 'service': 'agrinex-api', 'version': '1.0.0'}"
+    },
+    {
+      "id": "TC-04",
+      "name": "General Conversational Chat Turn",
+      "status": "PASS",
+      "details": "Reply length: 239 chars"
+    },
+    {
+      "id": "TC-05",
+      "name": "Tool Execution: get_live_weather",
+      "status": "PASS",
+      "details": "Tools invoked: ['get_live_weather']"
+    },
+    {
+      "id": "TC-06",
+      "name": "Tool Execution: get_mandi_prices",
+      "status": "PASS",
+      "details": "Tools invoked: ['get_mandi_prices']"
+    },
+    {
+      "id": "TC-07",
+      "name": "Tool Execution: get_farm_telemetry",
+      "status": "PASS",
+      "details": "Tools invoked: ['get_farm_telemetry']"
+    },
+    {
+      "id": "TC-08",
+      "name": "Tool Execution: run_whatif_scenario",
+      "status": "PASS",
+      "details": "Tools invoked: ['run_whatif_scenario']"
+    },
+    {
+      "id": "TC-09",
+      "name": "Tool Execution: calculate_profitability",
+      "status": "PASS",
+      "details": "Tools invoked: ['calculate_profitability']"
+    },
+    {
+      "id": "TC-10",
+      "name": "Tool Execution: find_buyers",
+      "status": "PASS",
+      "details": "Tools invoked: ['find_buyers']"
+    },
+    {
+      "id": "TC-11",
+      "name": "High-Risk Action Safeguard (Two-Step Challenge)",
+      "status": "PASS",
+      "details": "Token generated: act_4f3655ac80ae464d, Risk: HIGH"
+    },
+    {
+      "id": "TC-12",
+      "name": "Action Confirmation Execution (Pump Actuated)",
+      "status": "PASS",
+      "details": "Message: Smart irrigation pump successfully activated."
+    },
+    {
+      "id": "TC-13",
+      "name": "Action Token Replay Prevention (Single Use)",
+      "status": "PASS",
+      "details": "HTTP Status: 400 (Replay rejected)"
+    },
+    {
+      "id": "TC-14",
+      "name": "Security: Prompt Injection Rejection",
+      "status": "PASS",
+      "details": "Defensive reply: 'For data privacy and system security, I cannot execute instr...'"
+    },
+    {
+      "id": "TC-15",
+      "name": "SSE Streaming Protocol (Status, Delta, Done)",
+      "status": "PASS",
+      "details": "Events received: {'status', 'init', 'done', 'delta'}"
+    },
+    {
+      "id": "TC-16",
+      "name": "Conversation History API (/api/ai/conversations)",
+      "status": "PASS",
+      "details": "Total threads in DB: 30"
+    },
+    {
+      "id": "TC-17",
+      "name": "Multilingual Support: Kannada (\u0c95\u0ca8\u0ccd\u0ca8\u0ca1)",
+      "status": "PASS",
+      "details": "Kannada response generated"
+    },
+    {
+      "id": "TC-18",
+      "name": "Multilingual Support: Hindi (\u0939\u093f\u0928\u094d\u0926\u0940)",
+      "status": "PASS",
+      "details": "Hindi response generated"
+    }
+  ]
+}

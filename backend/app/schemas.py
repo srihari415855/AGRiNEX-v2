@@ -99,7 +99,11 @@ class ImageAnalysisRequest(BaseModel):
 
 class CropRecommendRequest(BaseModel):
     farm_id: Optional[str] = None
+    zone_id: Optional[str] = None
     language: Optional[str] = "en"
+    season_override: Optional[str] = None
+    soil_type_override: Optional[str] = None
+    water_avail_override: Optional[str] = None
 
 class WhatIfRequest(BaseModel):
     farm_id: Optional[str] = None

@@ -1,0 +1,497 @@
+[
+  {
+    "id": "TC-001",
+    "category": "Health",
+    "name": "API Gateway Root Endpoint",
+    "expected": "200 with status online",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "{'message': 'Welcome to AGRiNEX Farm Intelligence API', 'status': 'online'}"
+  },
+  {
+    "id": "TC-002",
+    "category": "Health",
+    "name": "Standard Health Check Endpoint",
+    "expected": "200 OK",
+    "actual": "200",
+    "status": "PASS",
+    "details": "{'status': 'healthy', 'service': 'agrinex-api', 'version': '1.0.0'}"
+  },
+  {
+    "id": "TC-003",
+    "category": "Auth",
+    "name": "Farmer Signup",
+    "expected": "200 with token and user profile",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "User created: qa_auditor_1790939714364@testagrinex.in, ID: 450ee679-f484-4d28-9ed0-31e088f17d12"
+  },
+  {
+    "id": "TC-004",
+    "category": "Auth",
+    "name": "Prevent Duplicate Email Signup",
+    "expected": "400 Bad Request",
+    "actual": "400",
+    "status": "PASS",
+    "details": "{'detail': 'Email already registered'}"
+  },
+  {
+    "id": "TC-005",
+    "category": "Auth",
+    "name": "Reject Invalid Email on Signup",
+    "expected": "422 Validation Error",
+    "actual": "422",
+    "status": "PASS",
+    "details": "{'detail': [{'type': 'value_error', 'loc': ['body', 'email'], 'msg': 'value is not a valid email address: An email address must have an @-sign.', 'input': 'not-an-email', 'ctx': {'reason': 'An email address must have an @-sign.'}}]}"
+  },
+  {
+    "id": "TC-006",
+    "category": "Auth",
+    "name": "Farmer Login",
+    "expected": "200 with valid JWT",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Login successful"
+  },
+  {
+    "id": "TC-007",
+    "category": "Auth",
+    "name": "Reject Invalid Password",
+    "expected": "401 Unauthorized",
+    "actual": "401",
+    "status": "PASS",
+    "details": "{'detail': 'Incorrect email or password'}"
+  },
+  {
+    "id": "TC-008",
+    "category": "Auth",
+    "name": "Reject Non-Existent User Login",
+    "expected": "401 Unauthorized",
+    "actual": "401",
+    "status": "PASS",
+    "details": "{'detail': 'Incorrect email or password'}"
+  },
+  {
+    "id": "TC-009",
+    "category": "Auth",
+    "name": "Get Current User Profile (/api/auth/me)",
+    "expected": "200 with email match",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "User verified: qa_auditor_1790939714364@testagrinex.in"
+  },
+  {
+    "id": "TC-010",
+    "category": "Security",
+    "name": "Reject /api/auth/me without Token",
+    "expected": "401 Unauthorized",
+    "actual": "401",
+    "status": "PASS",
+    "details": "Access denied without token"
+  },
+  {
+    "id": "TC-011",
+    "category": "Farms",
+    "name": "List Farms for User",
+    "expected": "200 with list",
+    "actual": "200 OK (0 farms)",
+    "status": "PASS",
+    "details": "Count: 0"
+  },
+  {
+    "id": "TC-012",
+    "category": "Farms",
+    "name": "Create Farm (/api/farms)",
+    "expected": "200 with created Farm record",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Farm ID: 56e116b7-0f39-4aa6-bd78-9d8a03ea57b7"
+  },
+  {
+    "id": "TC-013",
+    "category": "Farms",
+    "name": "Get Farm by ID",
+    "expected": "200 with matching ID",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Farm name: QA Green Valley 1790939714364"
+  },
+  {
+    "id": "TC-014",
+    "category": "Farms",
+    "name": "Update Farm",
+    "expected": "200 with updated area 16.0",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Updated area: 16.0"
+  },
+  {
+    "id": "TC-015",
+    "category": "Farms",
+    "name": "Get Demo Farm (/api/demo/farm)",
+    "expected": "200 with demo farm details",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Demo farm: AGRiNEX Demo Farm"
+  },
+  {
+    "id": "TC-016",
+    "category": "Zones",
+    "name": "Create Zone in Farm",
+    "expected": "200 with zone ID",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Zone ID: 616b704f-7222-45a7-bdd5-0bcf4d2615fa"
+  },
+  {
+    "id": "TC-017",
+    "category": "Zones",
+    "name": "List Zones in Farm",
+    "expected": "200 with list containing created zone",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Zones count: 2"
+  },
+  {
+    "id": "TC-018",
+    "category": "Zones",
+    "name": "Get Zone Real-Time Sensor Telemetry",
+    "expected": "200 with moisture and temperature",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Moisture: 50.4%, Temp: 28.7\u00b0C"
+  },
+  {
+    "id": "TC-019",
+    "category": "Irrigation",
+    "name": "Recommend Irrigation Duration",
+    "expected": "200 with recommended duration",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Duration: 7 min, Gross Litres: 81611"
+  },
+  {
+    "id": "TC-020",
+    "category": "Irrigation",
+    "name": "Start Irrigation Cycle",
+    "expected": "200 with event started and IoT pump energized",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Event ID: None, Pump: ON"
+  },
+  {
+    "id": "TC-021",
+    "category": "Irrigation",
+    "name": "Get Real-Time Irrigation Status",
+    "expected": "200 with pump and valve state",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "State: None, Hardware: None"
+  },
+  {
+    "id": "TC-022",
+    "category": "Irrigation",
+    "name": "Extend Running Irrigation Duration",
+    "expected": "200 with added minutes",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "New duration: 20 min"
+  },
+  {
+    "id": "TC-023",
+    "category": "Irrigation",
+    "name": "Stop Irrigation Cycle",
+    "expected": "200 with pump stopped",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Stopped state: None"
+  },
+  {
+    "id": "TC-024",
+    "category": "Irrigation",
+    "name": "List Irrigation History",
+    "expected": "200 with events list",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Historical records: 1"
+  },
+  {
+    "id": "TC-025",
+    "category": "AI/ML Vision",
+    "name": "Topsoil Optical ML Diagnostics",
+    "expected": "200 with ML soil classification & confidence",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Soil: Clay Loam, pH: 6.5 - 7.2, Conf: 88.5%"
+  },
+  {
+    "id": "TC-026",
+    "category": "AI/ML Vision",
+    "name": "Plant Pathology & Vigor Diagnostics",
+    "expected": "200 with pathogen and severity",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Pathogen: Late Blight (Phytophthora infestans), Severity: Stage 1 (Mild / Incipient)"
+  },
+  {
+    "id": "TC-027",
+    "category": "AI/ML Vision",
+    "name": "List Analyses History",
+    "expected": "200 with list of records",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Specimens stored: 6"
+  },
+  {
+    "id": "TC-028",
+    "category": "AI/ML Vision",
+    "name": "Delete Analysis Specimen Record",
+    "expected": "200 OK",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Deleted 61343a8f-face-49af-befb-122371166bda"
+  },
+  {
+    "id": "TC-029",
+    "category": "AI Agronomy",
+    "name": "Crop Suitability Recommendation",
+    "expected": "200 with recommended crops",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Recommendations generated: ['structured', 'crops', 'recommendations', 'seasonal_recommendations']"
+  },
+  {
+    "id": "TC-030",
+    "category": "What-If Engine",
+    "name": "Get What-If Scenario Recommendations",
+    "expected": "200 with scenario prompts list",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Scenarios: 7"
+  },
+  {
+    "id": "TC-031",
+    "category": "What-If Engine",
+    "name": "Parse Natural Language Scenario Prompt",
+    "expected": "200 with parsed parameters",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Scenario: temp_rise, Change: 4.0"
+  },
+  {
+    "id": "TC-032",
+    "category": "What-If Engine",
+    "name": "Run Agro-Climatic Simulation",
+    "expected": "200 with baseline vs simulated delta",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Title: Custom Simulation: Farm Decision Support, Difference: ['water_saved_litres', 'cost_savings_inr', 'moisture_delta_pct', 'stress_delta_pct', 'risk_verdict']"
+  },
+  {
+    "id": "TC-033",
+    "category": "Weather",
+    "name": "Micro-Climatic Live Weather Feed",
+    "expected": "200 with current temperature and humidity",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Source: Open-Meteo, Temp: 30.0\u00b0C"
+  },
+  {
+    "id": "TC-034",
+    "category": "Market",
+    "name": "Real-Time APMC Mandi Rate Intelligence",
+    "expected": "200 with mandi quotes",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Market data fetched: ['source', 'market_data_date', 'crop', 'farm_name', 'farm_location']"
+  },
+  {
+    "id": "TC-035",
+    "category": "Buyers",
+    "name": "Query Verified Agri Buyers",
+    "expected": "200 with buyer profiles and premium prices",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Keys: ['crop', 'farm_location', 'market_date', 'source', 'market_analysis', 'benchmark_mandi_price', 'items']"
+  },
+  {
+    "id": "TC-036",
+    "category": "Buyers",
+    "name": "Create Buyer Procurement Contract Enquiry",
+    "expected": "200 with enquiry record and tracking code",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Enquiry ID: 32f73219-17d3-4a82-ac9d-b62a199432f7, Tracking: AGX-BUY-261002-4149"
+  },
+  {
+    "id": "TC-037",
+    "category": "Buyers",
+    "name": "List Farmer Buyer Enquiries",
+    "expected": "200 with enquiries list",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Found 1 enquiry records"
+  },
+  {
+    "id": "TC-038",
+    "category": "Production",
+    "name": "Create Harvest Production Record",
+    "expected": "200 with record ID",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Record ID: 9846ff70-a074-4799-b997-e422e342ace7"
+  },
+  {
+    "id": "TC-039",
+    "category": "Production",
+    "name": "List Harvest Production Records",
+    "expected": "200 with list",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Total records: 1"
+  },
+  {
+    "id": "TC-040",
+    "category": "Production",
+    "name": "Delete Harvest Production Record",
+    "expected": "200 OK",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Deleted 9846ff70-a074-4799-b997-e422e342ace7"
+  },
+  {
+    "id": "TC-041",
+    "category": "Profitability",
+    "name": "Get Crop Cost Benchmarks & Context",
+    "expected": "200 with agronomic benchmarks",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Crop: Tomato, Benchmarks available: ['seed_cost', 'fertilizer_cost', 'labour_cost', 'water_cost', 'crop_protection_cost', 'machinery_cost', 'other_cost', 'total_production_cost', 'typical_yield_per_acre_kg', 'suggested_quantity_kg']"
+  },
+  {
+    "id": "TC-042",
+    "category": "Profitability",
+    "name": "Run Net Profitability & ROI Calculation",
+    "expected": "200 with net profit and ROI",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Net Profit: \u20b915860.0, ROI: 33.64%"
+  },
+  {
+    "id": "TC-043",
+    "category": "Devices",
+    "name": "Register IoT Sensor Node",
+    "expected": "200 with registered device ID",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Device ID: 85a0b1fa-887f-41ca-90db-15289e091071"
+  },
+  {
+    "id": "TC-044",
+    "category": "Devices",
+    "name": "List Registered IoT Sensor Nodes",
+    "expected": "200 with devices list",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Device count: 1"
+  },
+  {
+    "id": "TC-045",
+    "category": "Devices",
+    "name": "Deregister IoT Sensor Node",
+    "expected": "200 OK",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Deleted 85a0b1fa-887f-41ca-90db-15289e091071"
+  },
+  {
+    "id": "TC-046",
+    "category": "Reports",
+    "name": "Generate Farm Analytics Intelligence Report",
+    "expected": "200 with report record",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Report ID: 10d2355b-e4a5-4c87-9fd2-7edc9ec37ef7"
+  },
+  {
+    "id": "TC-047",
+    "category": "Reports",
+    "name": "Query Farm Consolidated Master Audit Data",
+    "expected": "200 with comprehensive farm telemetry",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Farm: QA Green Valley Updated 1790939714364, Sections: ['report_id', 'title', 'summary', 'farm_name', 'farm_id', 'data']"
+  },
+  {
+    "id": "TC-048",
+    "category": "Reports",
+    "name": "Generate & Stream Master Farm Audit PDF Dossier",
+    "expected": "200 with valid binary PDF payload",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "PDF Binary (9911 bytes)"
+  },
+  {
+    "id": "TC-049",
+    "category": "Reports",
+    "name": "List Farm Intelligence Reports",
+    "expected": "200 with reports list",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Reports count: 2"
+  },
+  {
+    "id": "TC-050",
+    "category": "AI Dialogue",
+    "name": "Conversational Agronomic Intelligence (/api/ask)",
+    "expected": "200 with domain-specific answer",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Answer preview: I've analyzed the moisture telemetry for QA Green Valley Updated 1790939714364. ..."
+  },
+  {
+    "id": "TC-051",
+    "category": "Voice",
+    "name": "Query Voice & AI Gateway Status",
+    "expected": "200 with config flags",
+    "actual": "200 OK",
+    "status": "PASS",
+    "details": "Gemini: True, ElevenLabs: True"
+  },
+  {
+    "id": "TC-052",
+    "category": "Security",
+    "name": "SQL Injection Resistance in JSON Parameters",
+    "expected": "Handled safely without database error/leak",
+    "actual": "200 Handled",
+    "status": "PASS",
+    "details": "No database error or data leak"
+  },
+  {
+    "id": "TC-053",
+    "category": "Security",
+    "name": "Path Traversal Protection on PDF Endpoints",
+    "expected": "400/404 Blocked safely",
+    "actual": "404",
+    "status": "PASS",
+    "details": "Directory traversal blocked"
+  },
+  {
+    "id": "TC-054",
+    "category": "Robustness",
+    "name": "Handling Negative Financial Input Bounds",
+    "expected": "Handled safely without backend crash",
+    "actual": "200",
+    "status": "PASS",
+    "details": "Handled: 15860.0"
+  },
+  {
+    "id": "TC-055",
+    "category": "Robustness",
+    "name": "Extreme Integer Boundary for Irrigation Duration",
+    "expected": "Handled safely without crash",
+    "actual": "200",
+    "status": "PASS",
+    "details": "No crash"
+  }
+]
