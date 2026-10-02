@@ -59,11 +59,11 @@ export default function Auth() {
                 <form onSubmit={(e) => submit(e, "login")} className="space-y-3">
                   <div>
                     <Label>{t(lang, "email")}</Label>
-                    <Input data-testid="login-email" name="email" type="email" required defaultValue="shettysapthami15@gmail.com" />
+                    <Input data-testid="login-email" name="email" type="email" required placeholder="name@example.com" />
                   </div>
                   <div>
                     <Label>{t(lang, "password")}</Label>
-                    <Input data-testid="login-password" name="password" type="password" required defaultValue="Agrinex@2026" />
+                    <Input data-testid="login-password" name="password" type="password" required placeholder="••••••••" />
                   </div>
                   <Button data-testid="login-submit" disabled={busy} className="w-full bg-emerald-700 hover:bg-emerald-800">{busy ? "..." : t(lang, "login")}</Button>
                 </form>

@@ -73,7 +73,7 @@ function AuthContent() {
                       name="email"
                       type="email"
                       required
-                      defaultValue="admin@gmail.com"
+                      placeholder="name@example.com"
                     />
                   </div>
                   <div>
@@ -83,7 +83,7 @@ function AuthContent() {
                       name="password"
                       type="password"
                       required
-                      defaultValue="Admin@123"
+                      placeholder="••••••••"
                     />
                   </div>
                   <Button

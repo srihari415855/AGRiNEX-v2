@@ -1,0 +1,134 @@
+================================================================================
+AGRiNEX — COMPLETE TECHNOLOGY STACK SPECIFICATION
+================================================================================
+
+1. FRONTEND TIER (WEB APPLICATION)
+--------------------------------------------------------------------------------
+- Core Framework: Next.js 16.3.6 (App Router architecture, React Server Components, Turbopack)
+- Base Library: React 19.2.8 & React DOM 19.2.8
+- Language: TypeScript 5.0+ (strict end-to-end type safety)
+- Styling Framework: Tailwind CSS v4.0 (@tailwindcss/postcss)
+- Component Primitives (Headless UI): Radix UI
+  * @radix-ui/react-dialog
+  * @radix-ui/react-select
+  * @radix-ui/react-tabs
+  * @radix-ui/react-label
+  * @radix-ui/react-slot
+- Utility Styling: class-variance-authority (cva), clsx, tailwind-merge
+- Data Visualization & Charts: Recharts 3.10.1 (Area, Bar, Line, ResponsiveContainer)
+- Iconography: Lucide React (lucide-react v1.47.0)
+- Notifications & Feedback: Sonner (toast notifications)
+- HTTP Client: Axios 1.20.0
+- Digital Twin Canvas: HTML5 Canvas API & SVG Vector Layer
+- Internationalization (i18n): Custom Multi-language Localization Engine
+  * English (en)
+  * Hindi (hi / हिन्दी)
+  * Kannada (kn / ಕನ್ನಡ)
+- Audio/Voice Client: Web Speech API (SpeechRecognition & SpeechSynthesis fallback)
+
+2. BACKEND TIER (API GATEWAY & BUSINESS LOGIC)
+--------------------------------------------------------------------------------
+- Framework: FastAPI 0.115+ (Python asynchronous REST API framework)
+- ASGI Server: Uvicorn 0.30+ (with standard uvloop & websockets support)
+- Language: Python 3.10+ / 3.14 compatible
+- Data Validation & Serialization: Pydantic v2 (pydantic[email] 2.0+)
+- Authentication & Security:
+  * python-jose (JWT token generation, signature validation, HS256 algorithm)
+  * passlib[bcrypt] & bcrypt 4.0.1 (salted password hashing)
+  * OAuth2 with Password Bearer & optional user resolution
+- Multipart / Form Handling: python-multipart 0.0.9+
+- HTTP & Network Requests: Requests 2.31.0+, Certifi (SSL/TLS certificate verification)
+- Cross-Origin Resource Sharing (CORS): FastAPI CORSMiddleware
+
+3. DATABASE & PERSISTENCE TIER
+--------------------------------------------------------------------------------
+- Object-Relational Mapper (ORM): SQLAlchemy 2.0+ (Declarative Base, Relationship mapping, eager loading)
+- Database Engine: SQLite (agrinex.db) (Production-ready for PostgreSQL + PostGIS spatial geometry)
+- Database Migrations: Alembic 1.13.0+
+- Relational Data Models:
+  * Users (authentication, credentials, preferred language)
+  * Farms (acreage, geo-coordinates, water source, irrigation type)
+  * Zones (micro-zones, soil type, crop variety, live moisture telemetry)
+  * IrrigationEvents (irrigation logs, duration, method, valve status)
+  * Analyses (soil vision tests, plant pathology records, produce inspection)
+  * ProductionRecords (harvest yields, bag counts, storage lot tracking)
+  * Devices (IoT sensors, relays, valves)
+  * Reports (generated farm audit summaries, PDF metadata)
+  * BuyerEnquiries (APMC market trading bids, dispatch tracking)
+  * Conversations & ChatMessages (conversational AI history & tool call logs)
+
+4. MACHINE LEARNING & AGRONOMIC REASONING ENGINES
+--------------------------------------------------------------------------------
+- Scientific Computing: NumPy 1.26+
+- Machine Learning Classifier: Scikit-Learn 1.4+ (RandomForestClassifier for soil spectral classification)
+- Image Processing & Spectral Extraction: Pillow (PIL) 10.0+ (RGB colorimetry, hue, saturation, value, texture variance)
+- Precision Irrigation Engine (FAO-56 Irrigation Standard):
+  * Penman-Monteith Evapotranspiration (ET0) & Crop Evapotranspiration (ETc = Kc × ET0)
+  * Net Irrigation Requirement (NIR) & Gross Irrigation Requirement (GIR)
+  * 9 Irrigation Efficiency Models (Subsurface Drip 95%, Standard Drip 90%, Micro-Sprinkler 82%, Rain Gun 80%, Overhead 75%, Furrow 65%, Manual 60%, Flood 55%, Custom 50-99%)
+  * Diurnal Solar Window Scheduling (minimizes evaporation losses by 30-35%)
+- Digital Twin What-If Engine (whatif_engine.py):
+  * Multi-scenario virtual perturbation simulations (heatwaves, droughts, irrigation delays)
+  * Soil Available Water Capacity (AWC) dynamics
+  * Plant Available Water (PAW) & Readily Available Water (RAW) depletion curves
+- Dynamic Crop Recommendation Engine (crop_recommendation_engine.py):
+  * 32-crop agronomic knowledge matrix
+  * 6-pillar multi-factor vector analysis (Soil texture, Live Moisture, Open-Meteo weather, Irrigation type, Sowing season, Crop rotation & botanical family harmony)
+  * Ground-truth validation (strict 'Data unavailable' truthfulness)
+- Storage Holding Economics Engine:
+  * Cold storage holding costs (Rs/bag/month) & physiological weight shrinkage (1.5% - 3.5%) vs APMC price recovery curves
+
+5. ARTIFICIAL INTELLIGENCE & MULTIMODAL VISION
+--------------------------------------------------------------------------------
+- Primary Vision & LLM: Google Gemini API (gemini-3-flash-preview / multimodal vision & text reasoning)
+- Multimodal Vision Diagnostics:
+  * Topsoil spectral evaluation (organic matter, SOC, colorimetric humic saturation)
+  * Foliar plant pathology diagnosis (leaf spots, blights, rusts, nutrient chlorosis)
+  * Harvested produce quality grading (Grade A/B/C inspection, skin firmness, market shelf-life)
+- Controlled Autonomous AI Agent (orchestrator.py):
+  * Controlled tool execution loop with high/low risk authorization tiers
+  * Action confirmation tokens for physical actuation (pumps, solenoid valves)
+- Natural Language Scenario Parser:
+  * Semantic intent extraction mapping conversational prompts to simulation parameters
+
+6. VOICE, SPEECH & AUDIO TECHNOLOGIES
+--------------------------------------------------------------------------------
+- Text-to-Speech (TTS): ElevenLabs API (high-fidelity natural voices in English, Hindi, and Kannada)
+- Fallback Speech Engine: HTML5 Web Speech API (speechSynthesis & SpeechRecognition)
+- Audio Payload Format: Base64-encoded MP3 audio streaming
+
+7. INTERNET OF THINGS (IoT) & HARDWARE CONTROL
+--------------------------------------------------------------------------------
+- Microcontroller Gateway: ESP32 Edge Architecture (ESP32-AGRI-GATEWAY-01)
+- Actuation Subsystems:
+  * Main Irrigation Pump Magnetic Contactor Relay Switching
+  * Zone Solenoid Valve Actuation (VALVE-Z1 to VALVE-Z5)
+- Safety & Interlock Safeguards:
+  * Automatic hardware countdown shutoff timers
+  * Line pressure relief trip monitoring
+  * Hardware flow meter telemetry (LPM discharge rates)
+
+8. EXTERNAL APIS & DATA FEEDS
+--------------------------------------------------------------------------------
+- Meteorological Feed: Open-Meteo API (real-time temperature, humidity, precipitation, wind speed, solar radiation, and 3-to-7 day rainfall forecasts)
+- Reverse Geocoding: Open-Meteo Geocoding API & built-in Indian agricultural district coordinate resolver
+- Market Intelligence: APMC Mandi Real-time Rate Matrix (benchmarks, modal prices, 7-day price velocity, freight friction deduction Rs/km/quintal)
+
+9. DOCUMENT GENERATION & REPORTING
+--------------------------------------------------------------------------------
+- PDF Engine: ReportLab 4.0+ (canvas, Flowables, Platypus, custom typography, table grids, RGB palette)
+- Image Embedding: Pillow (PIL)
+- Output Artifacts: Enterprise Farm Audit Dossiers, Technical Agronomic Reports, Soil Health Cards (formatted in Indian Standard Time IST)
+
+10. DEVOPS, TOOLING & TESTING
+--------------------------------------------------------------------------------
+- Build Tool: Next.js Turbopack
+- Package Managers: npm (Node.js) & pip (Python)
+- Quality Assurance:
+  * Comprehensive End-to-End API Integration Suite (test_all_endpoints.py — 55/55 passed)
+  * End-to-End Autonomous AI Assistant Test (test_ai_assistant_e2e.py)
+  * End-to-End Frontend Suite (test_e2e_full_suite.mjs)
+  * TypeScript Compiler (tsc --noEmit) & ESLint
+- Operating Systems Supported: Windows (PowerShell / Batch launchers), Linux, macOS
+- Launchers: run_project.bat & run_project.ps1 (dual-service automated launcher)
+================================================================================
