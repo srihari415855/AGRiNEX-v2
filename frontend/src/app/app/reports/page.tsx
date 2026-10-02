@@ -21,6 +21,7 @@ import {
   RefreshCw,
   Award,
   Activity,
+  Download,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -104,6 +105,14 @@ export default function ReportsPage() {
     toast.success("Consolidated master report refreshed with latest farm telemetry & saved analyses.");
   };
 
+  const handleDownloadPdf = () => {
+    const target = activeFarm || "demo-farm";
+    const token = typeof window !== "undefined" ? localStorage.getItem("agrinex_token") : "";
+    const url = `${API}/reports/farm/${target}/master-report.pdf${token ? `?token=${token}` : ""}`;
+    window.open(url, "_blank");
+    toast.success("Opening Master Farm Dossier PDF...");
+  };
+
   const data = masterReport?.data || {};
   const weather = data.weather?.current;
   const zones = data.zones || [];
@@ -135,6 +144,13 @@ export default function ReportsPage() {
             >
               <RefreshCw size={14} className={refreshing ? "animate-spin" : ""} />
               Sync Latest Data
+            </Button>
+            <Button
+              onClick={handleDownloadPdf}
+              className="bg-emerald-700 hover:bg-emerald-800 text-white text-xs rounded-xl flex items-center gap-1.5 h-10 px-3 cursor-pointer shadow-sm"
+            >
+              <Download size={14} />
+              Download Master PDF
             </Button>
           </div>
         </div>

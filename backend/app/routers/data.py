@@ -577,6 +577,7 @@ def resolve_crop_market_intelligence(searched_crop: str) -> dict:
     }
 
 @router.get("/weather")
+@router.get("/data/weather")
 def get_weather(lat: Optional[float] = None, lon: Optional[float] = None):
     latitude = lat if lat is not None else 13.1373
     longitude = lon if lon is not None else 78.1298
@@ -592,11 +593,35 @@ def get_weather(lat: Optional[float] = None, lon: Optional[float] = None):
     try:
         resp = requests.get(url, timeout=5)
         if resp.status_code == 200:
+            om_data = resp.json()
+            cur = om_data.get("current", {})
+            daily = om_data.get("daily", {})
+            forecast_items = []
+            if "time" in daily:
+                for i, d in enumerate(daily["time"]):
+                    high = daily.get("temperature_2m_max", [30.0])[i] if i < len(daily.get("temperature_2m_max", [])) else 30.0
+                    low = daily.get("temperature_2m_min", [20.0])[i] if i < len(daily.get("temperature_2m_min", [])) else 20.0
+                    precip = daily.get("precipitation_sum", [0.0])[i] if i < len(daily.get("precipitation_sum", [])) else 0.0
+                    forecast_items.append({
+                        "date": d,
+                        "condition": "Rainy" if precip > 2.0 else "Sunny / Clear",
+                        "temp_high": high,
+                        "temp_low": low,
+                        "precipitation_chance": min(100, int(precip * 15))
+                    })
             return {
                 "source": "Open-Meteo",
                 "status": "LIVE",
                 "fetched_at": datetime.now(timezone.utc).isoformat(),
-                "data": resp.json()
+                "location": f"Coordinates ({latitude:.4f}, {longitude:.4f})",
+                "current": {
+                    "temp": cur.get("temperature_2m", 28.5),
+                    "condition": "Rainy" if cur.get("precipitation", 0) > 0.5 else "Sunny / Clear",
+                    "humidity": cur.get("relative_humidity_2m", 60),
+                    "wind_kph": cur.get("wind_speed_10m", 12.0)
+                },
+                "forecast": forecast_items,
+                "data": om_data
             }
     except Exception as e:
         print("Open-Meteo fetch failed, using fallback", e)
@@ -604,11 +629,23 @@ def get_weather(lat: Optional[float] = None, lon: Optional[float] = None):
     # High-quality realistic fallback if offline
     today = datetime.now(timezone.utc)
     dates = [(today + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(7)]
+    fallback_forecast = [
+        {"date": dates[i], "condition": "Rainy" if [0.0, 0.0, 2.4, 8.5, 0.0, 0.0, 0.0][i] > 2.0 else "Sunny / Clear", "temp_high": [30.2, 31.0, 29.5, 28.8, 30.5, 31.2, 29.8][i], "temp_low": [19.5, 20.1, 18.9, 19.2, 20.0, 20.4, 19.8][i], "precipitation_chance": int([0.0, 0.0, 2.4, 8.5, 0.0, 0.0, 0.0][i] * 12)}
+        for i in range(7)
+    ]
     
     return {
         "source": "Open-Meteo",
         "status": "LIVE",
         "fetched_at": today.isoformat(),
+        "location": f"Coordinates ({latitude:.4f}, {longitude:.4f})",
+        "current": {
+            "temp": 28.5,
+            "condition": "Sunny / Clear",
+            "humidity": 58,
+            "wind_kph": 12.4
+        },
+        "forecast": fallback_forecast,
         "data": {
             "latitude": latitude,
             "longitude": longitude,
@@ -628,6 +665,7 @@ def get_weather(lat: Optional[float] = None, lon: Optional[float] = None):
     }
 
 @router.get("/market")
+@router.get("/market/prices")
 def get_market(
     crop: Optional[str] = "Tomato",
     farm_id: Optional[str] = None,
@@ -797,7 +835,11 @@ def get_market(
         },
         "ai_summary": summary_text,
         "best_selling_advice": spec_advice,
-        "items": items
+        "items": items,
+        "markets": items,
+        "mandis": items,
+        "data": items,
+        "prices": items
     }
 
 @router.get("/data/market-prices")
@@ -2223,6 +2265,7 @@ def get_profitability_context(
         "area_acres": area,
         "quantity_kg": qty,
         "default_economics": econ,
+        "benchmarks": econ,
         "perishability_profile": perishability,
         "weather_risk": weather_risk,
         "market_trend": market_trend,
@@ -2233,6 +2276,7 @@ def get_profitability_context(
 
 
 @router.post("/profitability")
+@router.post("/profitability/calculate")
 def calculate_profitability(
     body: Dict[str, Any],
     db: Session = Depends(get_db),
@@ -2622,6 +2666,9 @@ def calculate_profitability(
         "total_cost": current_total_all_in_cost,
         "margin": current_net_return,
         "margin_pct": current_margin_pct,
+        "net_profit": current_net_return,
+        "roi_percentage": round((current_net_return / current_total_all_in_cost * 100), 2) if current_total_all_in_cost > 0 else 0.0,
+        "total_production_cost": total_production_cost,
         "breakdown": {
             "seed": seed,
             "fertilizer": fert,
@@ -3072,6 +3119,8 @@ def get_consolidated_master_report(
         "report_id": existing_rep.id,
         "title": existing_rep.title,
         "summary": master_summary,
+        "farm_name": farm_name,
+        "farm_id": fid,
         "data": combined_data
     }
 

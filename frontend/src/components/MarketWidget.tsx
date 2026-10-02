@@ -13,21 +13,21 @@ type MarketData = {
   }[];
 };
 
-export default function MarketWidget({ token }: { token: string }) {
+import { api } from "@/lib/api";
+
+export default function MarketWidget({ token }: { token?: string }) {
   const [market, setMarket] = useState<MarketData | null>(null);
 
   useEffect(() => {
     const fetchMarket = async () => {
       try {
-        const res = await fetch("http://localhost:8000/data/market-prices", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        if (res.ok) setMarket(await res.json());
+        const res = await api.get("/data/market-prices");
+        setMarket(res.data);
       } catch (err) {
         console.error(err);
       }
     };
-    if (token) fetchMarket();
+    fetchMarket();
   }, [token]);
 
   if (!market) return <div className="p-6 bg-white/60 rounded-3xl animate-pulse h-40"></div>;

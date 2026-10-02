@@ -24,12 +24,21 @@
 }
 
 body {
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Noto Sans Kannada', 'Noto Sans Devanagari', 'Noto Sans Telugu', 'Noto Sans Tamil', 'Noto Sans Malayalam', 'Noto Sans Bengali', 'Nirmala UI', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background-color: #fafaf9;
   color: #1c1917;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Indic script vertical metric alignment and no-clip rules */
+[lang="kn"], [lang="hi"], [lang="te"], [lang="ta"], [lang="ml"], [lang="mr"], [lang="bn"],
+.indic-text {
+  font-family: 'Noto Sans Kannada', 'Noto Sans Devanagari', 'Noto Sans Telugu', 'Noto Sans Tamil', 'Noto Sans Malayalam', 'Noto Sans Bengali', 'Nirmala UI', system-ui, sans-serif;
+  line-height: 1.5;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Outfit', 'Noto Sans Kannada', 'Noto Sans Devanagari', sans-serif;
 }
+

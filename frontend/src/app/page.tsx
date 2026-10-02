@@ -31,12 +31,14 @@ export default function Landing() {
         </div>
         <div className="flex items-center gap-2">
           <Select value={lang} onValueChange={setLang}>
-            <SelectTrigger data-testid="landing-lang-select" className="w-[140px] h-9 bg-white">
+            <SelectTrigger data-testid="landing-lang-select" className="w-[145px] h-10 bg-white text-xs sm:text-sm font-semibold">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               {LANGS.map((l) => (
-                <SelectItem key={l.code} value={l.code}>{l.native}</SelectItem>
+                <SelectItem key={l.code} value={l.code} className="font-medium">
+                  <span className="indic-text text-sm">{l.native}</span>
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>

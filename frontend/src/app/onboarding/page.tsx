@@ -37,8 +37,8 @@ export default function Onboarding() {
       const payload = {
         ...farm,
         area: parseFloat(farm.area) || 0,
-        latitude: farm.latitude ? parseFloat(farm.latitude) : 13.1373,
-        longitude: farm.longitude ? parseFloat(farm.longitude) : 78.1298,
+        latitude: farm.latitude ? parseFloat(farm.latitude) : undefined,
+        longitude: farm.longitude ? parseFloat(farm.longitude) : undefined,
       };
       const r = await api.post("/farms", payload);
       for (const z of zones) {

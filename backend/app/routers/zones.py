@@ -50,6 +50,9 @@ def get_zone_sensor(zone_id: str, db: Session = Depends(get_db)):
             "moisture_pct": moist,
             "temperature_c": temp,
             "humidity_pct": humidity,
+            "moisture": moist,
+            "temperature": temp,
+            "humidity": humidity,
             "timestamp": datetime.now(timezone.utc).isoformat()
         }
     
@@ -76,5 +79,8 @@ def get_zone_sensor(zone_id: str, db: Session = Depends(get_db)):
         "moisture_pct": moist,
         "temperature_c": temp,
         "humidity_pct": humidity,
+        "moisture": moist,
+        "temperature": temp,
+        "humidity": humidity,
         "timestamp": datetime.now(timezone.utc).isoformat()
     }

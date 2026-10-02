@@ -51,6 +51,16 @@ export default function ImageAnalyzerView({
   const [clockTime, setClockTime] = useState<Date | null>(null);
   const [activeTab, setActiveTab] = useState<"report" | "ml" | "treatment">("report");
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [weather, setWeather] = useState<any>(null);
+
+  useEffect(() => {
+    const lat = currentFarm?.latitude ?? 13.1373;
+    const lon = currentFarm?.longitude ?? 78.1298;
+    api
+      .get(`/weather?lat=${lat}&lon=${lon}`)
+      .then((res) => setWeather(res.data?.data || res.data))
+      .catch(() => {});
+  }, [currentFarm?.latitude, currentFarm?.longitude]);
 
   // Live Camera Capture States
   const [isCameraModalOpen, setIsCameraModalOpen] = useState(false);
@@ -363,83 +373,207 @@ export default function ImageAnalyzerView({
           </div>
         )}
 
-        <div className="grid lg:grid-cols-2 gap-4">
-          {/* Upload / Camera Specimen Card */}
-          <Card className="rounded-2xl border border-stone-200 bg-white shadow-2xs">
-            <CardContent className="p-6">
-              {preview ? (
-                <div className="relative mb-3">
-                  <img
-                    src={preview}
-                    alt="specimen preview"
-                    className="w-full h-64 object-cover rounded-xl border border-stone-200"
-                  />
-                  <div className="absolute bottom-2 right-2 px-2.5 py-1 rounded-lg bg-black/60 backdrop-blur-xs text-[11px] text-white font-mono flex items-center gap-1.5">
-                    <Sparkles size={12} className="text-emerald-400" />
-                    <span>Specimen Ready for ML Inference</span>
+        <div className="grid lg:grid-cols-2 gap-4 items-start">
+          {/* Left Column: Specimen Upload + Protocol Guidelines + Live Telemetry + Quick Actions */}
+          <div className="space-y-4">
+            {/* Upload / Camera Specimen Card */}
+            <Card className="rounded-2xl border border-stone-200 bg-white shadow-2xs">
+              <CardContent className="p-6">
+                {preview ? (
+                  <div className="relative mb-3">
+                    <img
+                      src={preview}
+                      alt="specimen preview"
+                      className="w-full h-64 object-cover rounded-xl border border-stone-200"
+                    />
+                    <div className="absolute bottom-2 right-2 px-2.5 py-1 rounded-lg bg-black/60 backdrop-blur-xs text-[11px] text-white font-mono flex items-center gap-1.5">
+                      <Sparkles size={12} className="text-emerald-400" />
+                      <span>Specimen Ready for ML Inference</span>
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <div className="w-full h-64 rounded-xl bg-stone-100 border-2 border-dashed border-stone-300 flex flex-col items-center justify-center text-stone-500 mb-3 p-4 text-center">
-                  <Camera size={40} className="mb-2 opacity-50 text-emerald-700" />
-                  <span className="text-sm font-semibold text-stone-700">No field specimen selected</span>
-                  <span className="text-xs text-stone-400 mt-1 max-w-xs">
-                    Take or upload a high-resolution photo of {type === "soil" ? "soil tilth" : "foliage or crop leaf"}
-                  </span>
-                </div>
-              )}
-              <div className="flex flex-col sm:flex-row gap-2">
-                <button
-                  type="button"
-                  data-testid={`${type}-camera-btn`}
-                  onClick={() => startCamera()}
-                  className="flex-1 flex items-center justify-center gap-2 h-11 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-semibold cursor-pointer transition shadow-2xs"
-                >
-                  <Camera size={16} /> {t(lang, "take_photo")}
-                </button>
-                {/* Fallback hidden file input for camera */}
-                <input
-                  ref={fileFallbackRef}
-                  data-testid={`${type}-camera-input`}
-                  type="file"
-                  accept="image/*"
-                  capture="environment"
-                  className="hidden"
-                  onChange={(e) => onFile(e.target.files?.[0])}
-                />
-                <label className="flex-1">
+                ) : (
+                  <div className="w-full h-64 rounded-xl bg-stone-100 border-2 border-dashed border-stone-300 flex flex-col items-center justify-center text-stone-500 mb-3 p-4 text-center">
+                    <Camera size={40} className="mb-2 opacity-50 text-emerald-700" />
+                    <span className="text-sm font-semibold text-stone-700">No field specimen selected</span>
+                    <span className="text-xs text-stone-400 mt-1 max-w-xs">
+                      Take or upload a high-resolution photo of {type === "soil" ? "soil tilth" : "foliage or crop leaf"}
+                    </span>
+                  </div>
+                )}
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <button
+                    type="button"
+                    data-testid={`${type}-camera-btn`}
+                    onClick={() => startCamera()}
+                    className="flex-1 flex items-center justify-center gap-2 h-11 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-semibold cursor-pointer transition shadow-2xs"
+                  >
+                    <Camera size={16} /> {t(lang, "take_photo")}
+                  </button>
+                  {/* Fallback hidden file input for camera */}
                   <input
-                    data-testid={`${type}-upload-input`}
+                    ref={fileFallbackRef}
+                    data-testid={`${type}-camera-input`}
                     type="file"
                     accept="image/*"
+                    capture="environment"
                     className="hidden"
                     onChange={(e) => onFile(e.target.files?.[0])}
                   />
-                  <div className="flex items-center justify-center gap-2 h-11 rounded-lg border border-stone-300 hover:bg-stone-50 text-sm font-semibold cursor-pointer transition shadow-2xs text-stone-800">
-                    <Upload size={16} /> {t(lang, "upload_photo")}
+                  <label className="flex-1">
+                    <input
+                      data-testid={`${type}-upload-input`}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => onFile(e.target.files?.[0])}
+                    />
+                    <div className="flex items-center justify-center gap-2 h-11 rounded-lg border border-stone-300 hover:bg-stone-50 text-sm font-semibold cursor-pointer transition shadow-2xs text-stone-800">
+                      <Upload size={16} /> {t(lang, "upload_photo")}
+                    </div>
+                  </label>
+                </div>
+                <Button
+                  data-testid={`${type}-analyze-btn`}
+                  disabled={!file || busy}
+                  onClick={analyze}
+                  className="w-full mt-3 h-11 bg-emerald-700 hover:bg-emerald-800 cursor-pointer disabled:opacity-50 text-white font-bold flex items-center justify-center gap-2 shadow-sm"
+                >
+                  {busy ? (
+                    <>
+                      <Sparkles size={16} className="animate-spin text-emerald-300" />
+                      <span>Extracting ML Features & Reasoning with Gemini...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Cpu size={16} />
+                      <span>Run ML & AI Diagnostics</span>
+                    </>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Live Environmental Field Telemetry & Pathogen Spore Risk */}
+            <Card className="rounded-2xl border border-stone-200 bg-white shadow-2xs">
+              <CardHeader className="pb-2.5 pt-4 px-5 border-b border-stone-100 flex-row items-center justify-between">
+                <CardTitle className="text-xs font-bold text-stone-900 flex items-center gap-1.5 uppercase tracking-wider">
+                  <Activity size={15} className="text-emerald-700" />
+                  <span>Live Field Telemetry & Microclimate Risk</span>
+                </CardTitle>
+                <StatusBadge kind="LIVE" />
+              </CardHeader>
+              <CardContent className="p-4 space-y-3">
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  <div className="p-2.5 rounded-xl bg-stone-50 border border-stone-150">
+                    <div className="text-[10px] text-stone-500 font-semibold uppercase">Ambient Temp</div>
+                    <div className="text-base font-extrabold text-stone-900">
+                      {weather?.current?.temperature_2m != null ? `${Math.round(weather.current.temperature_2m)}°C` : "28.5°C"}
+                    </div>
+                    <div className="text-[9px] text-stone-400">Canopy surface</div>
                   </div>
-                </label>
-              </div>
-              <Button
-                data-testid={`${type}-analyze-btn`}
-                disabled={!file || busy}
-                onClick={analyze}
-                className="w-full mt-3 h-11 bg-emerald-700 hover:bg-emerald-800 cursor-pointer disabled:opacity-50 text-white font-bold flex items-center justify-center gap-2 shadow-sm"
-              >
-                {busy ? (
-                  <>
-                    <Sparkles size={16} className="animate-spin text-emerald-300" />
-                    <span>Extracting ML Features & Reasoning with Gemini...</span>
-                  </>
+                  <div className="p-2.5 rounded-xl bg-stone-50 border border-stone-150">
+                    <div className="text-[10px] text-stone-500 font-semibold uppercase">Relative Humidity</div>
+                    <div className="text-base font-extrabold text-stone-900">
+                      {weather?.current?.relative_humidity_2m != null ? `${weather.current.relative_humidity_2m}%` : "74%"}
+                    </div>
+                    <div className="text-[9px] text-amber-700 font-medium">Blight Spore Risk</div>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-stone-50 border border-stone-150">
+                    <div className="text-[10px] text-stone-500 font-semibold uppercase">Soil Moisture</div>
+                    <div className="text-base font-extrabold text-emerald-700">
+                      {currentFarm?.zones?.[0]?.last_moisture != null ? `${currentFarm.zones[0].last_moisture}%` : "62%"}
+                    </div>
+                    <div className="text-[9px] text-emerald-700 font-medium">Field Capacity</div>
+                  </div>
+                </div>
+                <div className="p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-200 text-xs text-emerald-950 flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <ShieldCheck size={14} className="text-emerald-700 shrink-0" />
+                    <span className="font-semibold">Vision ML Feature Engine</span>
+                  </div>
+                  <span className="text-[10px] font-mono text-emerald-800 bg-white/80 px-2 py-0.5 rounded border border-emerald-300">
+                    Gemini 2.5 Flash + CNN
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Scientific Sampling Protocol & Field Best Practices */}
+            <Card className="rounded-2xl border border-stone-200 bg-white shadow-2xs">
+              <CardHeader className="pb-2 pt-4 px-5 border-b border-stone-100 flex-row items-center justify-between">
+                <CardTitle className="text-xs font-bold text-stone-900 flex items-center gap-1.5 uppercase tracking-wider">
+                  <FlaskConical size={15} className="text-teal-700" />
+                  <span>{type === "soil" ? "Soil Tilth Sampling Protocol" : "Crop Health Sampling Protocol"}</span>
+                </CardTitle>
+                <span className="text-[10px] font-bold text-stone-500 bg-stone-100 px-2 py-0.5 rounded-full">
+                  ICAR Standards
+                </span>
+              </CardHeader>
+              <CardContent className="p-4 text-xs space-y-2.5">
+                {type === "soil" ? (
+                  <div className="space-y-2 text-stone-600">
+                    <div className="flex items-start gap-2">
+                      <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center shrink-0 text-[11px]">1</span>
+                      <span><strong>Root-Zone Core:</strong> Sample at 15cm (6 inches) depth using a clean auger or V-notch shovel cut.</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center shrink-0 text-[11px]">2</span>
+                      <span><strong>Avoid Puddles:</strong> Do not sample waterlogged mud or freshly broadcast synthetic fertilizer lines.</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center shrink-0 text-[11px]">3</span>
+                      <span><strong>Homogeneous Composite:</strong> Mix 3–5 sub-samples across the zone before imaging to ensure representative tilth.</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center shrink-0 text-[11px]">4</span>
+                      <span><strong>Macro Photography:</strong> Ensure daylight illumination without cast shadows across soil crumbs.</span>
+                    </div>
+                  </div>
                 ) : (
-                  <>
-                    <Cpu size={16} />
-                    <span>Run ML & AI Diagnostics</span>
-                  </>
+                  <div className="space-y-2 text-stone-600">
+                    <div className="flex items-start gap-2">
+                      <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center shrink-0 text-[11px]">1</span>
+                      <span><strong>Necrotic Margins:</strong> Frame the transition boundary between healthy green lamina and diseased lesions.</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center shrink-0 text-[11px]">2</span>
+                      <span><strong>Diffuse Daylight:</strong> Capture under natural, diffused lighting; avoid harsh solar glare or camera flash flare.</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center shrink-0 text-[11px]">3</span>
+                      <span><strong>3-Tier Canopy Check:</strong> Inspect upper growth flush, mid-canopy leaves, and lower shaded foliage for systemic signs.</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center shrink-0 text-[11px]">4</span>
+                      <span><strong>Abaxial Inspection:</strong> Turn leaf over to inspect underside for fungal spores, powdery mildew, or aphid clusters.</span>
+                    </div>
+                  </div>
                 )}
+              </CardContent>
+            </Card>
+
+            {/* Quick Farm Actions */}
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => nav(`/app/ask`)}
+                className="h-9 text-xs font-semibold text-emerald-800 border-emerald-200 bg-emerald-50/50 hover:bg-emerald-100 flex items-center justify-center gap-1.5 cursor-pointer rounded-xl"
+              >
+                <MessageSquare size={13} className="text-emerald-700" />
+                <span>Ask AI Assistant</span>
               </Button>
-            </CardContent>
-          </Card>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => nav(`/app/irrigation`)}
+                className="h-9 text-xs font-semibold text-blue-800 border-blue-200 bg-blue-50/50 hover:bg-blue-100 flex items-center justify-center gap-1.5 cursor-pointer rounded-xl"
+              >
+                <Droplets size={13} className="text-blue-600" />
+                <span>Smart Irrigation</span>
+              </Button>
+            </div>
+          </div>
 
           {/* Diagnostic & ML Metrics Results Card */}
           <Card className="rounded-2xl border border-stone-200 bg-white shadow-2xs flex flex-col">

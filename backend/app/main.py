@@ -117,6 +117,10 @@ api_router.include_router(zones.router)
 api_router.include_router(ai.router)
 api_router.include_router(data.router)
 
+@api_router.get("/health")
+def api_health_check():
+    return {"status": "healthy", "service": "agrinex-api", "version": "1.0.0"}
+
 app.mount("/api", api_router)
 
 # Also include directly at root for convenience
@@ -129,3 +133,7 @@ app.include_router(data.router)
 @app.get("/")
 def read_root():
     return {"message": "Welcome to AGRiNEX Farm Intelligence API", "status": "online"}
+
+@app.get("/health")
+def health_check():
+    return {"status": "healthy", "service": "agrinex-api", "version": "1.0.0"}

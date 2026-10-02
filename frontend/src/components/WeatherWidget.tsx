@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react";
 import { CloudRain, Sun, Cloud, Thermometer, Wind, Droplets } from "lucide-react";
 
+import { api } from "@/lib/api";
+
 type WeatherData = {
   location: string;
   current: {
@@ -19,21 +21,19 @@ type WeatherData = {
   }[];
 };
 
-export default function WeatherWidget({ token }: { token: string }) {
+export default function WeatherWidget({ token }: { token?: string }) {
   const [weather, setWeather] = useState<WeatherData | null>(null);
 
   useEffect(() => {
     const fetchWeather = async () => {
       try {
-        const res = await fetch("http://localhost:8000/data/weather", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        if (res.ok) setWeather(await res.json());
+        const res = await api.get("/data/weather");
+        setWeather(res.data);
       } catch (err) {
         console.error(err);
       }
     };
-    if (token) fetchWeather();
+    fetchWeather();
   }, [token]);
 
   if (!weather) return <div className="p-6 bg-white/60 rounded-3xl animate-pulse h-40"></div>;

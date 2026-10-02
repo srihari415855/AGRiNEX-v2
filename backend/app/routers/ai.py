@@ -607,7 +607,13 @@ def recommend_crop(req: schemas.CropRecommendRequest, db: Session = Depends(get_
                 clean_json = clean_json[:-3]
             parsed = json.loads(clean_json.strip())
             if "crops" in parsed and isinstance(parsed["crops"], list) and len(parsed["crops"]) > 0:
-                return {"structured": parsed}
+                crops_list = parsed["crops"]
+                return {
+                    "structured": parsed,
+                    "crops": crops_list,
+                    "recommendations": crops_list,
+                    "seasonal_recommendations": crops_list
+                }
         except Exception as e:
             print("Gemini crop recommendation parsing error:", e)
             
@@ -618,7 +624,12 @@ def recommend_crop(req: schemas.CropRecommendRequest, db: Session = Depends(get_
         "market_sentiment": market_sentiment,
         "crops": rec_crops
     }
-    return {"structured": fallback_structured}
+    return {
+        "structured": fallback_structured,
+        "crops": rec_crops,
+        "recommendations": rec_crops,
+        "seasonal_recommendations": rec_crops
+    }
 
 
 @router.get("/whatif/recommendations")
@@ -792,7 +803,7 @@ def ask_assistant(req: schemas.AskRequest, db: Session = Depends(get_db)):
 
     gemini_reply = call_gemini_api(system_instruction=system_instruction, contents=conversation_contents, fast_mode=True)
     if gemini_reply:
-        return {"reply": gemini_reply}
+        return {"reply": gemini_reply, "answer": gemini_reply}
     
     # Dynamic, contextual fallback if offline
     if "how is my farm" in msg or "status" in msg or "condition" in msg or "खेत" in msg or "ಜಮೀನು" in msg:
@@ -831,7 +842,7 @@ def ask_assistant(req: schemas.AskRequest, db: Session = Depends(get_db)):
         else:
             reply = f"Hello! I'm AGRiNEX, your AI farm assistant. At {farm_name} ({farm_place}), it is {time_str} on {date_str} with {weather_desc}. How can I assist your farming operations today?"
             
-    return {"reply": reply}
+    return {"reply": reply, "answer": reply}
 
 
 @router.get("/voice/status", response_model=schemas.VoiceConfigResponse)

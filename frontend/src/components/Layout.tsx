@@ -190,13 +190,13 @@ export default function Layout({
               </span>
             )}
             <Select value={lang} onValueChange={setLang}>
-              <SelectTrigger data-testid="lang-select" className="w-[120px] h-9 bg-white text-xs">
+              <SelectTrigger data-testid="lang-select" className="w-[130px] sm:w-[140px] h-10 bg-white text-xs sm:text-sm font-semibold">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {LANGS.map((l) => (
-                  <SelectItem key={l.code} value={l.code} data-testid={`lang-option-${l.code}`}>
-                    {l.native}
+                  <SelectItem key={l.code} value={l.code} data-testid={`lang-option-${l.code}`} className="font-medium">
+                    <span className="indic-text text-sm">{l.native}</span>
                   </SelectItem>
                 ))}
               </SelectContent>
