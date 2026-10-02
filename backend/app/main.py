@@ -1,5 +1,12 @@
 import os
+import sys
 import certifi
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+os.environ["PYTHONIOENCODING"] = "utf-8"
 
 os.environ["SSL_CERT_FILE"] = certifi.where()
 os.environ["REQUESTS_CA_BUNDLE"] = certifi.where()
@@ -7,7 +14,7 @@ os.environ["REQUESTS_CA_BUNDLE"] = certifi.where()
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .database import engine, Base, SessionLocal
-from .routers import auth, farms, zones, ai, data
+from .routers import auth, farms, zones, ai, data, ai_chat
 from . import models, auth as auth_util
 
 # Create database tables
@@ -111,10 +118,19 @@ app.add_middleware(
 
 # Mount routes under /api (matching extracted frontend api.js baseURL)
 api_router = FastAPI()
+api_router.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["Content-Disposition", "Content-Type", "Content-Length"],
+)
 api_router.include_router(auth.router)
 api_router.include_router(farms.router)
 api_router.include_router(zones.router)
 api_router.include_router(ai.router)
+api_router.include_router(ai_chat.router)
 api_router.include_router(data.router)
 
 @api_router.get("/health")
@@ -128,6 +144,7 @@ app.include_router(auth.router)
 app.include_router(farms.router)
 app.include_router(zones.router)
 app.include_router(ai.router)
+app.include_router(ai_chat.router)
 app.include_router(data.router)
 
 @app.get("/")

@@ -6,7 +6,7 @@ import { useApp } from "@/lib/AppContext";
 import { t, LANGS } from "@/lib/i18n";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
-import AskAgrinex from "@/components/AskAgrinex";
+import AIAssistantWidget from "@/components/AIAssistantWidget";
 import {
   Home, Layers, Camera, Leaf, Cloud, Droplets, Flower2, Sparkles,
   ShoppingCart, Users2, PackageOpen, Wallet, BarChart3, MessageSquare, FileText,
@@ -367,8 +367,8 @@ export default function Layout({
         </DialogContent>
       </Dialog>
 
-      {/* Floating Ask AGRiNEX Assistant */}
-      {pathname !== "/app/ask" && <AskAgrinex />}
+      {/* Production-Grade Floating AI Assistant */}
+      {pathname !== "/app/ask" && <AIAssistantWidget />}
     </div>
   );
 }

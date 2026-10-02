@@ -26,6 +26,7 @@ class User(Base):
     irrigations = relationship("IrrigationEvent", back_populates="user", cascade="all, delete-orphan")
     reports = relationship("Report", back_populates="user", cascade="all, delete-orphan")
     analyses = relationship("Analysis", back_populates="user", cascade="all, delete-orphan")
+    conversations = relationship("Conversation", back_populates="user", cascade="all, delete-orphan")
 
 class Farm(Base):
     __tablename__ = "farms"
@@ -165,3 +166,31 @@ class BuyerEnquiry(Base):
     
     user_id = Column(String, ForeignKey("users.id"), nullable=True)
     farm_id = Column(String, ForeignKey("farms.id"), nullable=True)
+
+class Conversation(Base):
+    __tablename__ = "conversations"
+    
+    id = Column(String, primary_key=True, default=gen_uuid, index=True)
+    user_id = Column(String, ForeignKey("users.id"), nullable=True)
+    farm_id = Column(String, ForeignKey("farms.id"), nullable=True)
+    title = Column(String, default="New Conversation")
+    created_at = Column(DateTime, default=get_utc_now)
+    updated_at = Column(DateTime, default=get_utc_now, onupdate=get_utc_now)
+    
+    user = relationship("User", back_populates="conversations")
+    farm = relationship("Farm")
+    messages = relationship("ChatMessage", back_populates="conversation", cascade="all, delete-orphan", order_by="ChatMessage.created_at")
+
+class ChatMessage(Base):
+    __tablename__ = "chat_messages"
+    
+    id = Column(String, primary_key=True, default=gen_uuid, index=True)
+    conversation_id = Column(String, ForeignKey("conversations.id"), index=True)
+    role = Column(String)  # "user", "assistant", "system", "tool"
+    content = Column(Text)
+    tool_calls = Column(JSON, nullable=True)
+    metadata_json = Column(JSON, nullable=True)
+    created_at = Column(DateTime, default=get_utc_now)
+    
+    conversation = relationship("Conversation", back_populates="messages")
+

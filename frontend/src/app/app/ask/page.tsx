@@ -25,6 +25,10 @@ import {
   Play,
   Square,
   Headphones,
+  AlertTriangle,
+  Check,
+  Cpu,
+  BookOpen,
 } from "lucide-react";
 import {
   startSpeechRecognition,
@@ -40,6 +44,15 @@ interface Message {
   time?: string;
   isVoice?: boolean;
   provider?: "elevenlabs" | "browser";
+  toolCalls?: Array<{ tool: string; result?: any }>;
+  citations?: Array<{ title: string; source: string }>;
+  confirmationRequired?: {
+    action_token: string;
+    description: string;
+    risk_level: string;
+    prompt_for_user?: string;
+  } | null;
+  confirmedStatus?: "confirmed" | "cancelled" | null;
 }
 
 export default function AskPage() {
@@ -47,6 +60,7 @@ export default function AskPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
+  const [confirmingToken, setConfirmingToken] = useState<string | null>(null);
   const [voiceMode, setVoiceMode] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [interimTranscript, setInterimTranscript] = useState("");
@@ -224,24 +238,34 @@ export default function AskPage() {
       // Build conversation history for interactive multi-turn session
       const historyPayload = messages.slice(-10).map((m) => ({
         role: m.role,
-        text: m.text,
+        content: m.text,
       }));
 
-      const r = await api.post("/ask", {
+      const r = await api.post("/ai/chat", {
         message: msg,
         language: lang,
         farm_id: activeFarm || "demo-farm",
         voice_mode: fromVoice || voiceMode,
         history: historyPayload,
+        page_context: { page_name: "/app/ask" },
       });
 
       const replyTime = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
       const botMsgId = "bot_" + Date.now();
-      const botReply = r.data.reply;
+      const botReply = r.data.reply || r.data.answer || "Task completed.";
 
       setMessages((m) => [
         ...m,
-        { id: botMsgId, role: "assistant", text: botReply, time: replyTime, isVoice: fromVoice },
+        {
+          id: botMsgId,
+          role: "assistant",
+          text: botReply,
+          time: replyTime,
+          isVoice: fromVoice,
+          toolCalls: r.data.tool_calls || undefined,
+          citations: r.data.citations || undefined,
+          confirmationRequired: r.data.confirmation_required || undefined,
+        },
       ]);
 
       // Automatically synthesize and speak response if autoSpeak is on
@@ -254,6 +278,37 @@ export default function AskPage() {
       toast.error("Failed to get response from AI agent");
     } finally {
       setBusy(false);
+    }
+  };
+
+  const handleConfirmAction = async (msgId: string, actionToken: string, confirmed: boolean) => {
+    setConfirmingToken(actionToken);
+    try {
+      const res = await api.post(`/ai/action/confirm`, {
+        action_token: actionToken,
+        confirmed,
+      });
+
+      const resultMsg = res.data?.message || (confirmed ? "Action executed successfully" : "Action cancelled");
+
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === msgId
+            ? {
+                ...m,
+                confirmedStatus: confirmed ? "confirmed" : "cancelled",
+                text: `${m.text}\n\n**${confirmed ? "✅ Confirmed & Executed" : "❌ Cancelled by User"}:** ${resultMsg}`,
+              }
+            : m
+        )
+      );
+
+      if (confirmed) toast.success(resultMsg);
+      else toast.info(resultMsg);
+    } catch (e: any) {
+      toast.error(e.response?.data?.detail || "Action confirmation failed or expired");
+    } finally {
+      setConfirmingToken(null);
     }
   };
 
@@ -578,6 +633,67 @@ export default function AskPage() {
                     }`}
                   >
                     <div>{m.text}</div>
+
+                    {/* Tool Calls Summary */}
+                    {m.toolCalls && m.toolCalls.length > 0 && (
+                      <div className="mt-2.5 pt-2 border-t border-stone-200/70">
+                        <div className="text-[11px] font-semibold text-emerald-800 flex items-center gap-1 mb-1">
+                          <Cpu size={12} className="text-emerald-700" />
+                          <span>Executed {m.toolCalls.length} Controlled Tool{m.toolCalls.length > 1 ? "s" : ""}:</span>
+                        </div>
+                        <div className="flex flex-wrap gap-1">
+                          {m.toolCalls.map((tc, idx) => (
+                            <span key={idx} className="px-2 py-0.5 bg-emerald-100 text-emerald-900 border border-emerald-300 rounded-md text-[10px] font-mono">
+                              {tc.tool}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Citations / Sources */}
+                    {m.citations && m.citations.length > 0 && (
+                      <div className="mt-2 pt-1.5 border-t border-stone-200/70 flex items-start gap-1.5 text-[11px] text-stone-600">
+                        <BookOpen size={12} className="text-emerald-700 mt-0.5 shrink-0" />
+                        <div className="space-y-0.5">
+                          {m.citations.map((c, i) => (
+                            <p key={i}>
+                              <strong className="text-stone-800">{c.title}</strong> ({c.source})
+                            </p>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* High-Risk Action Confirmation Card */}
+                    {m.confirmationRequired && !m.confirmedStatus && (
+                      <div className="mt-3 p-3 bg-amber-50 border border-amber-300 rounded-xl space-y-2">
+                        <div className="flex items-center gap-1.5 text-amber-900 font-bold text-xs">
+                          <AlertTriangle size={14} className="text-amber-600" />
+                          <span>Action Confirmation Required</span>
+                        </div>
+                        <p className="text-xs text-amber-800 leading-normal">
+                          {m.confirmationRequired.description}
+                        </p>
+                        <div className="flex items-center gap-2 pt-1">
+                          <button
+                            onClick={() => handleConfirmAction(m.id, m.confirmationRequired!.action_token, true)}
+                            disabled={confirmingToken === m.confirmationRequired.action_token}
+                            className="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg font-semibold text-xs transition flex items-center gap-1 shadow-sm"
+                          >
+                            <Check size={12} />
+                            {confirmingToken === m.confirmationRequired.action_token ? "Executing..." : "Confirm Action"}
+                          </button>
+                          <button
+                            onClick={() => handleConfirmAction(m.id, m.confirmationRequired!.action_token, false)}
+                            disabled={confirmingToken === m.confirmationRequired.action_token}
+                            className="px-3 py-1.5 bg-stone-200 hover:bg-stone-300 text-stone-700 rounded-lg font-semibold text-xs transition"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Footer Row: Audio Player button, Timestamp, Voice pill */}
                     <div

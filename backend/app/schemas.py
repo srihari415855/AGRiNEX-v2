@@ -253,3 +253,58 @@ class BuyerEnquiryResponse(BaseModel):
     created_at: datetime
     class Config:
         from_attributes = True
+
+# Production AI Assistant Schemas
+class AIChatMessageInput(BaseModel):
+    role: str
+    content: str
+
+class AIChatRequest(BaseModel):
+    message: str
+    conversation_id: Optional[str] = None
+    farm_id: Optional[str] = None
+    language: Optional[str] = "en"
+    page_context: Optional[Dict[str, Any]] = None
+    attachment: Optional[Dict[str, Any]] = None
+    history: Optional[List[AIChatMessageInput]] = []
+    voice_mode: Optional[bool] = False
+
+class AIChatResponse(BaseModel):
+    conversation_id: str
+    reply: str
+    answer: str
+    tool_calls: Optional[List[Dict[str, Any]]] = None
+    citations: Optional[List[Dict[str, Any]]] = None
+    confirmation_required: Optional[Dict[str, Any]] = None
+    suggested_questions: Optional[List[str]] = None
+
+class ActionConfirmRequest(BaseModel):
+    action_token: str
+    confirmed: bool
+
+class ActionConfirmResponse(BaseModel):
+    success: bool
+    message: str
+    result: Optional[Dict[str, Any]] = None
+
+class ChatMessageResponse(BaseModel):
+    id: str
+    conversation_id: str
+    role: str
+    content: str
+    tool_calls: Optional[Any] = None
+    metadata_json: Optional[Any] = None
+    created_at: datetime
+    class Config:
+        from_attributes = True
+
+class ConversationResponse(BaseModel):
+    id: str
+    title: str
+    farm_id: Optional[str] = None
+    created_at: datetime
+    updated_at: Optional[datetime] = None
+    messages: Optional[List[ChatMessageResponse]] = []
+    class Config:
+        from_attributes = True
+
